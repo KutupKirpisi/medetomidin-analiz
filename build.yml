@@ -1,0 +1,53 @@
+name: Windows EXE Derle
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-windows-exe:
+    runs-on: windows-latest
+
+    steps:
+      - name: Repoyu indir
+        uses: actions/checkout@v4
+
+      - name: Python 3.11 kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Bağımlılıkları kur
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller==6.10.0
+          pip install pywebview==5.3.4
+
+      - name: EXE derle (PyInstaller)
+        run: |
+          pyinstaller `
+            --onefile `
+            --windowed `
+            --name "MedetomidinAnalizSistemi" `
+            --add-data "app;app" `
+            --clean `
+            --noconfirm `
+            main.py
+
+      - name: EXE varlığını doğrula
+        run: |
+          if (Test-Path "dist\MedetomidinAnalizSistemi.exe") {
+            $size = (Get-Item "dist\MedetomidinAnalizSistemi.exe").length / 1MB
+            Write-Host "✅ EXE oluşturuldu: $([math]::Round($size,1)) MB"
+          } else {
+            Write-Error "❌ EXE bulunamadı!"
+            exit 1
+          }
+
+      - name: EXE'yi artifact olarak yükle
+        uses: actions/upload-artifact@v4
+        with:
+          name: MedetomidinAnalizSistemi-Windows-EXE
+          path: dist/MedetomidinAnalizSistemi.exe
+          retention-days: 90

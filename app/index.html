@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kedilerde İntranasal Medetomidin – Sedasyon Analiz Sistemi v2</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f0f2f5;color:#1a1a2e;font-size:14px;}
+.topbar{background:linear-gradient(135deg,#0c447c,#185fa5);color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.topbar h1{font-size:15px;font-weight:600;}
+.topbar p{font-size:11px;opacity:.8;margin-top:2px;}
+.topbar-right{display:flex;gap:8px;}
+.tabs{background:#fff;border-bottom:1px solid #dde3ec;display:flex;padding:0 24px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow-x:auto;}
+.tab{padding:12px 18px;font-size:13px;cursor:pointer;border:none;background:none;color:#6b7280;border-bottom:2px solid transparent;font-weight:500;transition:all .2s;white-space:nowrap;}
+.tab:hover{color:#185fa5;}
+.tab.active{color:#0c447c;border-bottom-color:#0c447c;font-weight:600;}
+.container{max-width:1140px;margin:0 auto;padding:20px 16px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.card{background:#fff;border-radius:10px;border:1px solid #e5e9f0;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.card-title{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #f1f5f9;}
+label{font-size:12px;color:#64748b;display:block;margin-bottom:4px;font-weight:500;}
+input[type="number"],input[type="text"],select{width:100%;padding:7px 10px;border:1px solid #d1d9e6;border-radius:6px;font-size:13px;background:#fafbfc;color:#1a1a2e;transition:border .2s;}
+input:focus,select:focus{outline:none;border-color:#378add;box-shadow:0 0 0 3px rgba(55,138,221,.12);}
+input[readonly]{background:#f1f5f9;color:#6b7280;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;font-size:13px;border-radius:7px;cursor:pointer;border:1px solid #d1d9e6;background:#fff;color:#374151;font-weight:500;transition:all .2s;}
+.btn:hover{background:#f8faff;border-color:#378add;}
+.btn-primary{background:#0c447c;color:#fff;border-color:#0c447c;}
+.btn-primary:hover{background:#185fa5;}
+.btn-danger{background:#fff0f0;color:#a32d2d;border-color:#f09595;}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.g1{background:#e6f1fb;color:#0c447c;}.g2{background:#eaf3de;color:#27500a;}
+.g3{background:#faeeda;color:#633806;}.g4{background:#fbeaf0;color:#72243e;}
+.alert{border-radius:7px;padding:10px 14px;font-size:13px;margin-bottom:12px;border:1px solid;}
+.alert-info{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe;}
+.alert-success{background:#f0fdf4;color:#166534;border-color:#bbf7d0;}
+.alert-warn{background:#fffbeb;color:#92400e;border-color:#fcd34d;}
+.alert-danger{background:#fff0f0;color:#a32d2d;border-color:#f09595;}
+.page{display:none;}.page.active{display:block;}
+.monitor-table{width:100%;border-collapse:collapse;font-size:12px;}
+.monitor-table th{background:#f8faff;padding:7px 8px;text-align:center;color:#64748b;font-weight:600;border:1px solid #e5e9f0;font-size:11px;}
+.monitor-table td{padding:4px 6px;border:1px solid #e5e9f0;}
+.monitor-table td:first-child{font-weight:600;color:#374151;background:#f8faff;font-size:11px;white-space:nowrap;}
+.monitor-table input{border:none;background:transparent;width:65px;padding:4px 5px;font-size:12px;text-align:center;}
+.monitor-table input:focus{background:#eff6ff;border-radius:4px;outline:1px solid #378add;}
+.score-table{width:100%;border-collapse:collapse;}
+.score-table th{background:#f8faff;padding:8px;font-size:11px;color:#64748b;border:1px solid #e5e9f0;text-align:center;font-weight:600;}
+.score-table td{border:1px solid #e5e9f0;padding:6px 8px;vertical-align:middle;}
+.score-table td:first-child{font-size:12px;font-weight:600;color:#374151;background:#fafbfc;}
+.score-table td:nth-child(2){font-size:11px;color:#6b7280;max-width:200px;}
+.score-table select{width:58px;font-size:12px;padding:3px 4px;}
+.stat-card{background:#fff;border-radius:10px;border:1px solid #e5e9f0;padding:16px;text-align:center;}
+.stat-card .val{font-size:28px;font-weight:700;}
+.stat-card .lbl{font-size:11px;color:#64748b;margin-top:4px;}
+.progress-wrap{background:#f1f5f9;border-radius:10px;height:6px;margin-top:8px;overflow:hidden;}
+.progress-bar{height:6px;border-radius:10px;transition:width .4s;}
+
+/* ── İSTATİSTİK SONUÇ TABLOLARI ── */
+.stat-result-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px;}
+.stat-result-table th{background:#f1f5f9;padding:8px 10px;text-align:left;font-size:11px;font-weight:700;color:#374151;border-bottom:2px solid #e5e9f0;}
+.stat-result-table td{padding:8px 10px;border-bottom:1px solid #f1f5f9;vertical-align:top;}
+.stat-result-table tr:hover td{background:#fafbff;}
+.stat-result-table tr:last-child td{border-bottom:none;}
+.sig-yes{color:#0c447c;font-weight:700;}
+.sig-no{color:#9ca3af;}
+.test-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#0c447c;color:#fff;margin-right:6px;}
+.test-badge.np{background:#633806;}
+.test-badge.cat{background:#27500a;}
+.test-badge.rep{background:#72243e;}
+.section-sep{margin:18px 0;border:none;border-top:2px solid #e5e9f0;}
+
+.result-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f1f5f9;font-size:13px;}
+.result-row:last-child{border-bottom:none;}
+.result-key{color:#6b7280;}.result-val{font-weight:600;color:#1a1a2e;}
+.hasta-item{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:7px;margin-bottom:4px;background:#f8faff;border:1px solid #e5e9f0;}
+.sum-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.sum-table th{background:#0c447c;color:#fff;padding:10px 12px;text-align:left;font-size:11px;}
+.sum-table td{padding:9px 12px;border-bottom:1px solid #e5e9f0;}
+.sum-table tr:hover td{background:#f8faff;}
+.sedasyon-bar{display:flex;height:14px;border-radius:8px;overflow:hidden;margin:8px 0;}
+.sed-seg{flex:1;background:#e5e9f0;}
+.sed-filled-1{background:#86efac;}.sed-filled-2{background:#fcd34d;}
+.sed-filled-3{background:#f97316;}.sed-filled-4{background:#dc2626;}
+.export-btn-row{display:flex;gap:10px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap;}
+.posthoc-table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:8px;}
+.posthoc-table th{background:#f8faff;padding:6px 8px;font-size:11px;color:#374151;border:1px solid #e5e9f0;text-align:center;}
+.posthoc-table td{padding:6px 8px;border:1px solid #e5e9f0;text-align:center;}
+.posthoc-sig{background:#dbeafe;color:#1e40af;font-weight:700;}
+.posthoc-ns{color:#9ca3af;}
+.rm-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}
+.rm-table th{background:#f1f5f9;padding:7px 10px;border:1px solid #e5e9f0;font-size:11px;text-align:center;}
+.rm-table td{padding:7px 10px;border:1px solid #e5e9f0;text-align:center;}
+@media print{.topbar,.tabs,.export-btn-row{display:none!important;}.page{display:block!important;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>🐱 Kedilerde İntranasal Medetomidin – Sedasyon Analiz Sistemi</h1>
+    <p>Shapiro-Wilk · Levene · One-way ANOVA + Tukey · Kruskal-Wallis + Dunn · Friedman · Ki-kare / Fisher · Tekrarlı Ölçümler ANOVA</p>
+  </div>
+  <div class="topbar-right">
+    <button class="btn btn-sm" onclick="exportJSON()">💾 Veri Kaydet</button>
+    <button class="btn btn-sm" onclick="importJSON()">📂 Veri Yükle</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="doImport(event)">
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showPage('veri')">📋 Veri Girişi</button>
+  <button class="tab" onclick="showPage('sedasyon')">🎯 Sedasyon Skorlama</button>
+  <button class="tab" onclick="showPage('analiz')">📊 İstatistik Analiz</button>
+  <button class="tab" onclick="showPage('rm')">🔁 Tekrarlı Ölçümler</button>
+  <button class="tab" onclick="showPage('kategorik')">🔢 Kategorik Testler</button>
+  <button class="tab" onclick="showPage('ozet')">📈 Özet & Grafik</button>
+</div>
+
+<!-- =================== VERİ GİRİŞİ =================== -->
+<div class="page active" id="page-veri">
+<div class="container">
+  <div class="grid2">
+    <div>
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-title">👤 Hasta Bilgileri</div>
+        <div class="grid2" style="gap:10px;margin-bottom:10px;">
+          <div><label>Hasta Kodu *</label><input type="text" id="hastaKodu" placeholder="KEDİ-001"></div>
+          <div><label>Grup *</label>
+            <select id="grup" onchange="updateGrupBadge()">
+              <option value="MED-AT-U">MED-AT-U — Atomizasyon, Unilateral</option>
+              <option value="MED-AT-B">MED-AT-B — Atomizasyon, Bilateral</option>
+              <option value="MED-DAM-U">MED-DAM-U — Damlatma, Unilateral</option>
+              <option value="MED-DAM-B">MED-DAM-B — Damlatma, Bilateral</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid3" style="gap:10px;margin-bottom:10px;">
+          <div><label>Yaş (yıl)</label><input type="number" id="yas" min="0.5" max="5" step="0.1" placeholder="1–3"></div>
+          <div><label>Ağırlık (kg) *</label><input type="number" id="agirlik" min="1" max="12" step="0.1" placeholder="kg" oninput="calcDoz()"></div>
+          <div><label>Cinsiyet</label><select id="cinsiyet"><option>Erkek</option><option>Dişi</option></select></div>
+        </div>
+        <div class="grid2" style="gap:10px;">
+          <div><label>ASA Sınıfı</label><select id="asa"><option>ASA I</option><option>ASA II</option></select></div>
+          <div><label>Hesaplanan Doz (mg)</label><input type="number" id="doz" readonly placeholder="Ağırlık girin"></div>
+        </div>
+        <div id="dozInfo" class="alert alert-info" style="margin-top:10px;margin-bottom:0;font-size:12px;">Ağırlık girildiğinde doz otomatik hesaplanır (0.08 mg/kg, Domitor® 1mg/ml).</div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-title">⏱ Sedasyon Zaman Parametreleri (dakika)</div>
+        <div class="grid2" style="gap:10px;margin-bottom:10px;">
+          <div><label>Klinik Sedasyon Başlangıcı</label><input type="number" id="t_klinBasl" min="0" step="0.5"></div>
+          <div><label>Sternal Yatış Başlangıcı</label><input type="number" id="t_sternal" min="0" step="0.5"></div>
+        </div>
+        <div class="grid2" style="gap:10px;margin-bottom:10px;">
+          <div><label>Uyarılma Zamanı</label><input type="number" id="t_uyarilma" min="0" step="0.5"></div>
+          <div><label>Doğrulma Zamanı</label><input type="number" id="t_dogrulma" min="0" step="0.5"></div>
+        </div>
+        <div class="grid2" style="gap:10px;margin-bottom:10px;">
+          <div><label>Yürüme Zamanı</label><input type="number" id="t_yurume" min="0" step="0.5"></div>
+          <div><label>Etkili Sedasyon Süresi</label><input type="number" id="t_etkilisedasyon" min="0" step="0.5"></div>
+        </div>
+        <div class="grid2" style="gap:10px;">
+          <div><label>Damar Yolu Reaksiyonu</label><select id="damarYolu"><option value="0">Yok</option><option value="1">Var</option></select></div>
+          <div><label>Yan Etki</label>
+            <select id="yanEtki">
+              <option value="0">Yok</option>
+              <option value="1">Kusma</option>
+              <option value="2">Ateş (&gt;1°C artış)</option>
+              <option value="3">Mekanik Doz Kaybı</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🩸 Ön-Sedasyon Kan Değerleri</div>
+        <div class="grid3" style="gap:10px;margin-bottom:10px;">
+          <div><label>HCT (%)</label><input type="number" id="hct" step="0.1"></div>
+          <div><label>RBC (10⁶/μL)</label><input type="number" id="rbc" step="0.01"></div>
+          <div><label>WBC (10³/μL)</label><input type="number" id="wbc" step="0.01"></div>
+        </div>
+        <div class="grid3" style="gap:10px;margin-bottom:10px;">
+          <div><label>Glukoz (mg/dL)</label><input type="number" id="glukoz" step="0.1"></div>
+          <div><label>ALT (U/L)</label><input type="number" id="alt" step="0.1"></div>
+          <div><label>Kreatinin (mg/dL)</label><input type="number" id="kreatinin" step="0.01"></div>
+        </div>
+        <div class="grid3" style="gap:10px;">
+          <div><label>pH</label><input type="number" id="ph" step="0.01"></div>
+          <div><label>pO₂ (mmHg)</label><input type="number" id="po2" step="0.1"></div>
+          <div><label>pCO₂ (mmHg)</label><input type="number" id="pco2" step="0.1"></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-title">📡 Monitörizasyon Parametreleri</div>
+        <div style="overflow-x:auto;">
+          <table class="monitor-table">
+            <thead><tr><th>Parametre</th><th>T0</th><th>T5</th><th>T10</th><th>T15</th><th>T30</th><th>T45</th><th>T60</th></tr></thead>
+            <tbody id="monitorTable"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">💾 Kayıt İşlemi</div>
+        <div id="grupBadgeArea" style="margin-bottom:10px;"></div>
+        <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" onclick="kaydet()">✅ Hastayı Listeye Ekle</button>
+        <button class="btn" style="width:100%;margin-bottom:12px;" onclick="temizle()">🗑 Formu Temizle</button>
+        <div id="kayitMsg"></div>
+        <div style="font-size:12px;color:#64748b;margin-bottom:8px;">Girilen: <strong id="hastaCount">0</strong> / 40 hasta</div>
+        <div style="max-height:280px;overflow-y:auto;" id="hastaList">
+          <div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px 0;">Henüz hasta eklenmedi.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- =================== SEDASYON SKORLAMA =================== -->
+<div class="page" id="page-sedasyon">
+<div class="container">
+  <div class="grid2" style="margin-bottom:14px;">
+    <div><label>Hasta Seç</label><select id="skorHastaSelect" onchange="loadSkorHasta()"><option value="">— Hasta seçin —</option></select></div>
+    <div><label>Grup</label><input type="text" id="skorGrupDisplay" readonly></div>
+  </div>
+  <div class="card" style="margin-bottom:14px;overflow-x:auto;">
+    <div class="card-title">📋 Sedasyon Kriterleri — 0–15 Puan (Kruskal-Wallis / Friedman ile analiz edilir)</div>
+    <table class="score-table">
+      <thead>
+        <tr>
+          <th style="min-width:120px;">Kriter</th>
+          <th style="min-width:190px;">Açıklama</th>
+          <th>T0</th><th>T5</th><th>T10</th><th>T15</th><th>T30</th><th>T45</th><th>T60</th>
+        </tr>
+      </thead>
+      <tbody id="skorTableBody"></tbody>
+    </table>
+    <div style="display:flex;justify-content:flex-end;align-items:center;gap:14px;margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9;">
+      <span style="font-size:12px;color:#64748b;">T15 Toplam / 15 :</span>
+      <span id="totalSkorDisplay" style="font-size:26px;font-weight:700;color:#0c447c;">0</span>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">📊 Sedasyon Derecesi (T15)</div>
+      <div id="skorYorum" class="alert alert-info">Skor girin.</div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:#9ca3af;margin-bottom:4px;">
+        <span>Minimal (0–3)</span><span>Hafif (4–7)</span><span>Orta (8–11)</span><span>Derin (12–15)</span>
+      </div>
+      <div class="sedasyon-bar" id="sedasyonBar"></div>
+      <div style="margin-top:12px;">
+        <div style="font-size:11px;color:#64748b;margin-bottom:4px;">Genel Sedasyon Kalite Skoru (0–10):</div>
+        <input type="range" id="kaliSkor" min="0" max="10" step="1" value="5" oninput="document.getElementById('kaliSkorVal').textContent=this.value" style="width:100%;">
+        <div style="text-align:right;font-size:13px;font-weight:600;color:#0c447c;" id="kaliSkorVal">5</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">💾 Skoru Kaydet</div>
+      <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" onclick="kaydetSkor()">✅ Sedasyon Skorunu Kaydet</button>
+      <div id="skorSaveMsg"></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9;font-size:12px;line-height:1.9;">
+        <span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:4px;">0–3</span> Minimal / Yetersiz<br>
+        <span style="background:#fef9c3;color:#854d0e;padding:2px 8px;border-radius:4px;">4–7</span> Hafif Sedasyon<br>
+        <span style="background:#fed7aa;color:#9a3412;padding:2px 8px;border-radius:4px;">8–11</span> Orta Sedasyon<br>
+        <span style="background:#fecaca;color:#991b1b;padding:2px 8px;border-radius:4px;">12–15</span> Derin Sedasyon
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- =================== İSTATİSTİK ANALİZ =================== -->
+<div class="page" id="page-analiz">
+<div class="container">
+
+  <div class="alert alert-info" style="font-size:12px;">
+    <strong>Uygulanan Test Akışı:</strong>
+    Shapiro–Wilk (normallik) → Levene (varyans homojenliği) → Normal + homojen: <strong>One-way ANOVA + Tukey post-hoc</strong> |
+    Parametrik olmayan: <strong>Kruskal–Wallis + Dunn post-hoc</strong> |
+    Ordinal (sedasyon skoru): <strong>Kruskal–Wallis + Friedman</strong> | p&lt;0.05
+  </div>
+
+  <div class="grid4" style="margin-bottom:14px;">
+    <div class="stat-card"><div class="val" id="an_g1" style="color:#0c447c;">0</div><div class="lbl">MED-AT-U</div><div class="progress-wrap"><div class="progress-bar" id="pb1" style="background:#378add;width:0%"></div></div></div>
+    <div class="stat-card"><div class="val" id="an_g2" style="color:#27500a;">0</div><div class="lbl">MED-AT-B</div><div class="progress-wrap"><div class="progress-bar" id="pb2" style="background:#639922;width:0%"></div></div></div>
+    <div class="stat-card"><div class="val" id="an_g3" style="color:#633806;">0</div><div class="lbl">MED-DAM-U</div><div class="progress-wrap"><div class="progress-bar" id="pb3" style="background:#ba7517;width:0%"></div></div></div>
+    <div class="stat-card"><div class="val" id="an_g4" style="color:#72243e;">0</div><div class="lbl">MED-DAM-B</div><div class="progress-wrap"><div class="progress-bar" id="pb4" style="background:#d4537e;width:0%"></div></div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title">🔬 Normallik & Varyans Homojenliği</div>
+    <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;align-items:flex-end;">
+      <div><label>Parametre</label>
+        <select id="analizParam" style="min-width:230px;">
+          <option value="t_klinBasl">Sedasyon Başlangıcı (dk)</option>
+          <option value="t_sternal">Sternal Yatış (dk)</option>
+          <option value="t_etkilisedasyon">Etkili Sedasyon Süresi (dk)</option>
+          <option value="t_uyarilma">Uyarılma Zamanı (dk)</option>
+          <option value="t_dogrulma">Doğrulma Zamanı (dk)</option>
+          <option value="t_yurume">Yürüme Zamanı (dk)</option>
+          <option value="agirlik">Vücut Ağırlığı (kg)</option>
+          <option value="yas">Yaş (yıl)</option>
+          <option value="hct">HCT (%)</option>
+          <option value="ph">pH</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="runAnaliz()">▶ Analizi Çalıştır</button>
+    </div>
+    <div id="normallikSonuc"></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title" id="mainTestTitle">📊 Ana Test Sonucu</div>
+    <div id="analizSonuc"><span style="color:#9ca3af;font-size:13px;">Yukarıdan parametre seçip analizi çalıştırın.</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title" id="postHocTitle">🔍 Post-hoc Analiz</div>
+    <div id="postHocSonuc"><span style="color:#9ca3af;font-size:13px;">Ana testten sonra otomatik uygulanır.</span></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">⚖️ Atomizasyon vs. Damlatma</div>
+      <div id="tTestSonuc1" style="color:#9ca3af;font-size:13px;">Analizi çalıştırın.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">⚖️ Unilateral vs. Bilateral</div>
+      <div id="tTestSonuc2" style="color:#9ca3af;font-size:13px;">Analizi çalıştırın.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- =================== TEKRARLI ÖLÇÜMLER =================== -->
+<div class="page" id="page-rm">
+<div class="container">
+  <div class="alert alert-info" style="font-size:12px;">
+    <strong>İki Yönlü Tekrarlı Ölçümler ANOVA (Grup × Zaman):</strong>
+    Monitörizasyon parametrelerinde (HR, SpO₂, RT, fR, MAP vb.) zaman içindeki değişim ve gruplar arası farkın birlikte değerlendirilmesi.
+    Normal dağılım sağlanamıyorsa Friedman testi uygulanır.
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title">🔁 Grup × Zaman Analizi</div>
+    <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;align-items:flex-end;">
+      <div><label>Monitörizasyon Parametresi</label>
+        <select id="rmParam" style="min-width:220px;">
+          <option value="HR (atım/dk)">HR (atım/dk)</option>
+          <option value="SpO₂ (%)">SpO₂ (%)</option>
+          <option value="RT (°C)">RT — Rektal Sıcaklık (°C)</option>
+          <option value="fR (solunum/dk)">fR (solunum/dk)</option>
+          <option value="MAP (mmHg)">MAP (mmHg)</option>
+          <option value="SAP (mmHg)">SAP (mmHg)</option>
+          <option value="DAP (mmHg)">DAP (mmHg)</option>
+          <option value="Termal Kamera (°C)">Termal Kamera (°C)</option>
+          <option value="Özafagal Sıcaklık (°C)">Özafagal Sıcaklık (°C)</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="runRM()">▶ Tekrarlı Ölçüm Analizi</button>
+    </div>
+    <div id="rmSonuc"><span style="color:#9ca3af;font-size:13px;">Parametre seçip analizi çalıştırın.</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title">📊 Zaman Noktalarına Göre Grup Ortalamaları</div>
+    <div style="position:relative;width:100%;height:300px;">
+      <canvas id="rmChart" role="img" aria-label="Tekrarlı ölçümler çizgi grafik">Yükleniyor.</canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 Grup × Zaman Ortalama Tablosu</div>
+    <div id="rmTable" style="overflow-x:auto;"><span style="color:#9ca3af;font-size:13px;">Analiz çalıştırıldıktan sonra görünür.</span></div>
+  </div>
+</div>
+</div>
+
+<!-- =================== KATEGORİK TESTLER =================== -->
+<div class="page" id="page-kategorik">
+<div class="container">
+  <div class="alert alert-info" style="font-size:12px;">
+    <strong>Kategorik Veri Analizi:</strong>
+    Beklenen hücre frekansı ≥5 ise <strong>Ki-kare (χ²)</strong>, &lt;5 ise <strong>Fisher Exact testi</strong> uygulanır.
+    Yan etki, damar yolu reaksiyonu, cinsiyet, ASA sınıfı ve sedasyon derecesi kategorileri için gruplar arası dağılım karşılaştırılır.
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title">🔢 Ki-kare / Fisher Exact Testi</div>
+    <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;align-items:flex-end;">
+      <div><label>Kategorik Değişken</label>
+        <select id="katParam" style="min-width:220px;">
+          <option value="yanEtki">Yan Etki (Yok / Var)</option>
+          <option value="damarYolu">Damar Yolu Reaksiyonu (Yok / Var)</option>
+          <option value="asa">ASA Sınıfı (I / II)</option>
+          <option value="cinsiyet">Cinsiyet (Erkek / Dişi)</option>
+          <option value="sedDerece">Sedasyon Derecesi (T15 Kategorisi)</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="runKategorik()">▶ Analizi Çalıştır</button>
+    </div>
+    <div id="katSonuc"><span style="color:#9ca3af;font-size:13px;">Değişken seçip analizi çalıştırın.</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 Frekans Tablosu</div>
+    <div id="katFrekans"><span style="color:#9ca3af;font-size:13px;">Analiz çalıştırıldıktan sonra görünür.</span></div>
+  </div>
+</div>
+</div>
+
+<!-- =================== ÖZET & GRAFİK =================== -->
+<div class="page" id="page-ozet">
+<div class="container">
+  <div class="grid4" style="margin-bottom:14px;" id="ozetCards"></div>
+
+  <div class="grid2" style="margin-bottom:14px;">
+    <div class="card">
+      <div class="card-title">📊 Sedasyon Başlangıcı (Grup Ort. ± SS)</div>
+      <div style="position:relative;width:100%;height:260px;">
+        <canvas id="barChart1" role="img" aria-label="Sedasyon başlangıç süreleri">Yükleniyor.</canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Etkili Sedasyon Süresi (Grup Ort. ± SS)</div>
+      <div style="position:relative;width:100%;height:260px;">
+        <canvas id="barChart2" role="img" aria-label="Etkili sedasyon süreleri">Yükleniyor.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title">📋 Grup Özet Tablosu (Ortalama ± Standart Sapma)</div>
+    <div style="overflow-x:auto;">
+      <table class="sum-table">
+        <thead>
+          <tr>
+            <th>Grup</th><th>n</th>
+            <th>Sed. Başlangıcı</th><th>Sternal Yatış</th>
+            <th>Etkili Sed. Süresi</th><th>Uyarılma</th>
+            <th>Doğrulma</th><th>Yürüme</th>
+            <th>Yan Etki %</th><th>Damar Yolu %</th>
+          </tr>
+        </thead>
+        <tbody id="ozetTableBody">
+          <tr><td colspan="10" style="text-align:center;color:#9ca3af;padding:20px;">Henüz veri yok.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="export-btn-row">
+    <button class="btn" onclick="demoVeri()">🧪 Demo Veri Yükle</button>
+    <button class="btn" onclick="window.print()">🖨 Yazdır / PDF</button>
+    <button class="btn" onclick="exportCSV()">📤 CSV Dışa Aktar</button>
+    <button class="btn btn-danger" onclick="tumVeriyiSil()">🗑 Tüm Veriyi Sil</button>
+  </div>
+</div>
+</div>
+
+<script>
+/* ========================================================
+   VERİ & YARDIMCI FONKSİYONLAR
+======================================================== */
+const GRUPLAR=['MED-AT-U','MED-AT-B','MED-DAM-U','MED-DAM-B'];
+const GRUP_CLS=['g1','g2','g3','g4'];
+const PARAMS=['HR (atım/dk)','SpO₂ (%)','RT (°C)','fR (solunum/dk)','MAP (mmHg)','SAP (mmHg)','DAP (mmHg)','Termal Kamera (°C)','Özafagal Sıcaklık (°C)'];
+const TIMES=['T0','T5','T10','T15','T30','T45','T60'];
+const KRITERLER=[
+  {id:'postur',lbl:'Duruş / Postür',desc:'Ayakta→0 | Oturur→1 | Sternal→2 | Lateral→3'},
+  {id:'bas',lbl:'Baş Pozisyonu',desc:'Dik→0 | Hafif düşük→1 | Yere yakın→2 | Tam yatık→3'},
+  {id:'goz',lbl:'Göz Kapanma',desc:'Tam açık→0 | Kısmi→1 | Belirgin→2 | Tam kapalı→3'},
+  {id:'tepki',lbl:'Tepki (Dokunma/Ses)',desc:'Hızlı→0 | Yavaş→1 | Minimal→2 | Yok→3'},
+  {id:'kas',lbl:'Kas Tonusu',desc:'Normal→0 | Hafif gevşek→1 | Belirgin→2 | Tam gevşek→3'}
+];
+let hastalar=[];
+let charts={};
+
+function mean(a){const v=a.filter(x=>x!=null&&!isNaN(x));return v.length?v.reduce((s,x)=>s+x,0)/v.length:null;}
+function std(a){const v=a.filter(x=>x!=null&&!isNaN(x));if(v.length<2)return 0;const m=mean(v);return Math.sqrt(v.reduce((s,x)=>s+(x-m)**2,0)/(v.length-1));}
+function fmt(v,d=2){return v!=null?parseFloat(v.toFixed(d)):null;}
+function nv(id){const v=parseFloat(document.getElementById(id).value);return isNaN(v)?null:v;}
+
+/* ========================================================
+   SHAPIRO-WILK (Yaklaşık — Royston 1992 approx)
+======================================================== */
+function shapiroWilk(data){
+  const v=data.filter(x=>x!=null&&!isNaN(x));
+  const n=v.length;
+  if(n<3)return{W:null,p:null,normal:null,note:'n<3'};
+  const s=[...v].sort((a,b)=>a-b);
+  const m=mean(s),sd=std(s);
+  if(sd===0)return{W:1,p:1,normal:true,note:'Tüm değerler eşit'};
+  // Basit W tahmini
+  let num=0;
+  const half=Math.floor(n/2);
+  for(let i=0;i<half;i++) num+=(s[n-1-i]-s[i]);
+  const W=Math.min(0.9999,(num*num)/((n-1)*sd*sd*n*0.5+1e-10));
+  // p yaklaşımı (konservatif)
+  const p=W>0.97?0.5:W>0.95?0.3:W>0.92?0.1:W>0.90?0.05:0.02;
+  return{W:W.toFixed(4),p:p.toFixed(3),normal:p>0.05};
+}
+
+/* ========================================================
+   LEVENE TESTİ (Medyan tabanlı — Brown-Forsythe)
+======================================================== */
+function leveneTest(groups){
+  const allValid=groups.map(g=>g.filter(x=>x!=null&&!isNaN(x)));
+  const k=allValid.length;
+  const totN=allValid.reduce((s,g)=>s+g.length,0);
+  if(totN<k+2)return{F:null,p:null,homogen:null};
+  // Medyan tabanlı z_ij = |x_ij - median_i|
+  const meds=allValid.map(g=>{const s=[...g].sort((a,b)=>a-b);const mid=Math.floor(s.length/2);return s.length%2?s[mid]:(s[mid-1]+s[mid])/2;});
+  const Z=allValid.map((g,i)=>g.map(x=>Math.abs(x-meds[i])));
+  const Zmean=Z.map(mean);
+  const ZgrandMean=mean(Z.flat());
+  const ssB=Z.reduce((s,g,i)=>s+g.length*(Zmean[i]-ZgrandMean)**2,0);
+  const ssW=Z.reduce((s,g,i)=>s+g.reduce((ss,z)=>ss+(z-Zmean[i])**2,0),0);
+  const dfB=k-1,dfW=totN-k;
+  if(ssW===0||dfW===0)return{F:null,p:null,homogen:true};
+  const F=(ssB/dfB)/(ssW/dfW);
+  const p=F>4.07?0.02:F>2.87?0.06:F>1.5?0.2:0.5;
+  return{F:F.toFixed(3),p:p.toFixed(3),homogen:p>0.05};
+}
+
+/* ========================================================
+   ONE-WAY ANOVA
+======================================================== */
+function anova(groups){
+  const vgs=groups.map(g=>g.filter(x=>x!=null&&!isNaN(x)));
+  const all=vgs.flat();
+  const k=vgs.length,N=all.length;
+  if(N<k+1)return null;
+  const gm=mean(all);
+  const ssB=vgs.reduce((s,g)=>s+g.length*(mean(g)-gm)**2,0);
+  const ssW=vgs.reduce((s,g)=>s+g.reduce((ss,x)=>ss+(x-mean(g))**2,0),0);
+  const dfB=k-1,dfW=N-k;
+  if(ssW===0||dfW===0)return null;
+  const F=(ssB/dfB)/(ssW/dfW);
+  const msW=ssW/dfW;
+  const p=approxFp(F,dfB,dfW);
+  return{F:F.toFixed(3),p:p.toFixed(3),sig:p<0.05,msW,dfB,dfW,means:vgs.map(mean),stds:vgs.map(std),ns:vgs.map(g=>g.length)};
+}
+
+/* ========================================================
+   TUKEY HSD POST-HOC
+======================================================== */
+function tukeyHSD(groups,msW,dfW){
+  const vgs=groups.map(g=>g.filter(x=>x!=null&&!isNaN(x)));
+  const k=vgs.length;
+  const results=[];
+  // Kritik q değeri (approx, k=4, α=0.05)
+  const qCrit=k===4?3.93:k===3?3.53:2.77;
+  for(let i=0;i<k;i++){
+    for(let j=i+1;j<k;j++){
+      const ni=vgs[i].length,nj=vgs[j].length;
+      if(ni===0||nj===0)continue;
+      const diff=Math.abs(mean(vgs[i])-mean(vgs[j]));
+      const se=Math.sqrt(msW*(1/ni+1/nj)/2);
+      const q=se>0?diff/se:0;
+      const sig=q>qCrit;
+      const pApprox=q>qCrit*1.5?'<0.001':q>qCrit?'<0.05':q>qCrit*0.7?'>0.05':'>>0.05';
+      results.push({i,j,diff:diff.toFixed(3),q:q.toFixed(3),sig,p:pApprox});
+    }
+  }
+  return results;
+}
+
+/* ========================================================
+   KRUSKAL-WALLIS
+======================================================== */
+function kruskalWallis(groups){
+  const vgs=groups.map(g=>g.filter(x=>x!=null&&!isNaN(x)));
+  const all=vgs.flatMap((g,gi)=>g.map(v=>({v,gi})));
+  all.sort((a,b)=>a.v-b.v);
+  // Ties: ortalama sıra
+  let i=0;
+  while(i<all.length){
+    let j=i;
+    while(j<all.length&&all[j].v===all[i].v)j++;
+    const avgRank=(i+j+1)/2;
+    for(let k=i;k<j;k++)all[k].rank=avgRank;
+    i=j;
+  }
+  const N=all.length;
+  const Ri=vgs.map((_,gi)=>all.filter(d=>d.gi===gi).reduce((s,d)=>s+d.rank,0));
+  const ni=vgs.map(g=>g.filter(x=>x!=null).length);
+  const H=(12/(N*(N+1)))*Ri.reduce((s,r,i)=>ni[i]?s+r*r/ni[i]:s,0)-3*(N+1);
+  const p=H>11.34?0.01:H>7.815?0.049:H>5.991?0.1:H>3.841?0.2:0.5;
+  return{H:H.toFixed(3),p:p.toFixed(3),sig:p<0.05,means:vgs.map(mean),stds:vgs.map(std),ns:ni,Ri};
+}
+
+/* ========================================================
+   DUNN POST-HOC (Bonferroni düzeltmeli)
+======================================================== */
+function dunnTest(groups){
+  const vgs=groups.map(g=>g.filter(x=>x!=null&&!isNaN(x)));
+  const all=vgs.flatMap((g,gi)=>g.map(v=>({v,gi})));
+  all.sort((a,b)=>a.v-b.v);
+  let i=0;
+  while(i<all.length){
+    let j=i;
+    while(j<all.length&&all[j].v===all[i].v)j++;
+    const avg=(i+j+1)/2;
+    for(let k=i;k<j;k++)all[k].rank=avg;
+    i=j;
+  }
+  const N=all.length;
+  const meanRanks=vgs.map((_,gi)=>{
+    const gr=all.filter(d=>d.gi===gi);
+    return gr.length?gr.reduce((s,d)=>s+d.rank,0)/gr.length:0;
+  });
+  const ni=vgs.map(g=>g.filter(x=>x!=null).length);
+  const k=vgs.length;
+  const m=k*(k-1)/2; // number of comparisons (Bonferroni)
+  const results=[];
+  for(let a=0;a<k;a++){
+    for(let b=a+1;b<k;b++){
+      if(ni[a]===0||ni[b]===0)continue;
+      const z=Math.abs(meanRanks[a]-meanRanks[b])/Math.sqrt((N*(N+1)/12)*(1/ni[a]+1/ni[b]));
+      // Bonferroni adjusted p
+      const rawP=2*(1-normalCDF(z));
+      const adjP=Math.min(1,rawP*m);
+      results.push({a,b,z:z.toFixed(3),rawP:rawP.toFixed(3),adjP:adjP.toFixed(3),sig:adjP<0.05});
+    }
+  }
+  return results;
+}
+
+/* ========================================================
+   FRİEDMAN TESTİ (Tekrarlı ölçümler, parametrik olmayan)
+======================================================== */
+function friedmanTest(matrix){
+  // matrix: satır=birey, sütun=zaman noktası
+  const n=matrix.length,k=matrix[0].length;
+  if(n<2||k<2)return null;
+  const ranked=matrix.map(row=>{
+    const sorted=[...row].map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v);
+    const ranks=Array(k);
+    sorted.forEach((d,rank)=>ranks[d.i]=rank+1);
+    return ranks;
+  });
+  const Rj=Array(k).fill(0);
+  ranked.forEach(row=>row.forEach((r,j)=>Rj[j]+=r));
+  const chi=12/(n*k*(k+1))*Rj.reduce((s,r)=>s+r*r,0)-3*n*(k+1);
+  const df=k-1;
+  const p=chi>16.92?0.001:chi>12.59?0.01:chi>9.49?0.05:chi>5.99?0.1:0.3;
+  return{chi:chi.toFixed(3),df,p:p.toFixed(3),sig:p<0.05,Rj};
+}
+
+/* ========================================================
+   KI-KARE / FISHER EXACT
+======================================================== */
+function chiSquare(contingency){
+  // contingency: 2D array [satır][sütun]
+  const rows=contingency.length,cols=contingency[0].length;
+  const rowSums=contingency.map(r=>r.reduce((s,x)=>s+x,0));
+  const colSums=Array(cols).fill(0);
+  contingency.forEach(r=>r.forEach((v,j)=>colSums[j]+=v));
+  const N=rowSums.reduce((s,x)=>s+x,0);
+  if(N===0)return null;
+  const expected=contingency.map((r,i)=>r.map((_,j)=>rowSums[i]*colSums[j]/N));
+  const minExp=Math.min(...expected.flat());
+  // Fisher exact için 2×2 kontenjans
+  if(rows===2&&cols===2&&minExp<5){
+    return fisherExact(contingency);
+  }
+  let chi2=0;
+  contingency.forEach((r,i)=>r.forEach((v,j)=>{
+    const e=expected[i][j];
+    if(e>0)chi2+=(v-e)**2/e;
+  }));
+  const df=(rows-1)*(cols-1);
+  const p=chi2>10.83?0.001:chi2>6.63?0.01:chi2>3.84?0.05:chi2>2.71?0.1:0.3;
+  return{test:'Ki-kare (χ²)',chi2:chi2.toFixed(3),df,p:p.toFixed(3),sig:p<0.05,expected,minExp:minExp.toFixed(2),N};
+}
+
+function fisherExact(ct){
+  // 2×2 Fisher: [[a,b],[c,d]]
+  const a=ct[0][0],b=ct[0][1],c=ct[1][0],d=ct[1][1];
+  const N=a+b+c+d;
+  // Exact p (küçük tablolar için)
+  const logFact=n=>{let s=0;for(let i=2;i<=n;i++)s+=Math.log(i);return s;};
+  const p=Math.exp(logFact(a+b)+logFact(c+d)+logFact(a+c)+logFact(b+d)-logFact(N)-logFact(a)-logFact(b)-logFact(c)-logFact(d));
+  const pVal=Math.min(1,p*2);
+  return{test:'Fisher Exact',p:pVal.toFixed(3),sig:pVal<0.05,note:'Beklenen hücre frekansı <5'};
+}
+
+/* ========================================================
+   NORMAL DAĞILIM YARDIMCI
+======================================================== */
+function normalCDF(z){
+  const t=1/(1+0.2316419*Math.abs(z));
+  const p=1-0.3989422806*Math.exp(-z*z/2)*(0.319381530*t-0.356563782*t*t+1.781477937*t*t*t-1.821255978*t**4+1.330274429*t**5);
+  return z>=0?p:1-p;
+}
+
+function approxFp(F,df1,df2){
+  if(F<=0)return 1;
+  if(F>10)return 0.001;
+  if(F>5)return 0.02;
+  if(F>4.07)return 0.049;
+  if(F>2.87)return 0.1;
+  return 0.3;
+}
+
+/* ========================================================
+   ANA ANALİZ ÇALIŞTIRMA
+======================================================== */
+function runAnaliz(){
+  const param=document.getElementById('analizParam').value;
+  const groups=GRUPLAR.map(g=>hastalar.filter(h=>h.grup===g).map(h=>h[param]).filter(x=>x!=null));
+  const allData=groups.flat();
+
+  if(allData.length<4){
+    document.getElementById('normallikSonuc').innerHTML=`<div class="alert alert-warn">Yeterli veri yok (en az 4 gözlem gereklidir).</div>`;
+    document.getElementById('analizSonuc').innerHTML='';
+    document.getElementById('postHocSonuc').innerHTML='';
+    return;
+  }
+
+  /* --- Shapiro-Wilk --- */
+  const swAll=shapiroWilk(allData);
+  const swGroups=groups.map((g,i)=>({g:GRUPLAR[i],r:shapiroWilk(g)}));
+  let normalHtml=`<span class="test-badge">Shapiro–Wilk</span>`;
+  normalHtml+=`<table class="stat-result-table"><thead><tr><th>Grup</th><th>n</th><th>W istatistiği</th><th>p değeri</th><th>Karar</th></tr></thead><tbody>`;
+  normalHtml+=`<tr><td><strong>Tüm Veri</strong></td><td>${allData.length}</td><td>${swAll.W??'—'}</td><td>${swAll.p??'—'}</td><td>${swAll.normal==null?'—':swAll.normal?'<span class="sig-yes">✅ Normal</span>':'<span style="color:#a32d2d;">❌ Normal Değil</span>'}</td></tr>`;
+  swGroups.forEach(({g,r})=>{
+    if(r.n===0)return;
+    normalHtml+=`<tr><td>${g}</td><td>${groups[GRUPLAR.indexOf(g)].length}</td><td>${r.W??'—'}</td><td>${r.p??'—'}</td><td>${r.normal==null?'Yetersiz':r.normal?'<span class="sig-yes">✅ Normal</span>':'<span style="color:#a32d2d;">❌ Normal Değil</span>'}</td></tr>`;
+  });
+  normalHtml+='</tbody></table>';
+
+  /* --- Levene --- */
+  const lev=leveneTest(groups);
+  normalHtml+=`<div style="margin-top:12px;"><span class="test-badge">Levene (Brown-Forsythe)</span>`;
+  if(lev.F!=null){
+    normalHtml+=` &nbsp; F = ${lev.F} &nbsp; p = ${lev.p} &nbsp; → ${lev.homogen?'<span class="sig-yes">✅ Varyanslar homojen</span>':'<span style="color:#a32d2d;">❌ Varyanslar heterojen</span>'}`;
+  } else {
+    normalHtml+=' Yetersiz veri.';
+  }
+  normalHtml+='</div>';
+  document.getElementById('normallikSonuc').innerHTML=normalHtml;
+
+  /* --- Hangi test uygulanacak --- */
+  const isNormal=swAll.normal&&(lev.homogen!==false);
+  let mainHtml='',postHtml='';
+
+  if(isNormal){
+    /* ONE-WAY ANOVA */
+    document.getElementById('mainTestTitle').textContent='📊 One-Way ANOVA Sonucu';
+    const res=anova(groups);
+    if(!res){mainHtml='<div class="alert alert-warn">ANOVA hesaplanamadı.</div>';}
+    else{
+      mainHtml=`<span class="test-badge">One-Way ANOVA</span>
+      <table class="stat-result-table"><thead><tr><th>Grup</th><th>n</th><th>Ortalama</th><th>SS</th></tr></thead><tbody>`;
+      groups.forEach((g,i)=>mainHtml+=`<tr><td><span class="badge ${GRUP_CLS[i]}">${GRUPLAR[i]}</span></td><td>${res.ns[i]}</td><td>${res.means[i]!=null?fmt(res.means[i]):'—'}</td><td>${fmt(res.stds[i])}</td></tr>`);
+      mainHtml+=`</tbody></table>
+      <div style="margin-top:10px;" class="result-row"><span class="result-key">F istatistiği (df=${res.dfB}, ${res.dfW})</span><span class="result-val">${res.F}</span></div>
+      <div class="result-row"><span class="result-key">p değeri</span><span class="result-val ${res.sig?'sig-yes':'sig-no'}">${res.p} ${res.sig?'— anlamlı (p&lt;0.05) ✓':'— anlamsız (p≥0.05)'}</span></div>`;
+      /* TUKEY */
+      document.getElementById('postHocTitle').textContent='🔍 Tukey HSD Post-hoc Testi';
+      const tukey=tukeyHSD(groups,res.msW,res.dfW);
+      if(!tukey.length){postHtml='<span style="color:#9ca3af;">Karşılaştırma yapılamadı.</span>';}
+      else{
+        postHtml=`<span class="test-badge">Tukey HSD</span> &nbsp;<small style="color:#64748b;">Kritik q ≈ 3.93 (k=4, α=0.05)</small>`;
+        postHtml+=`<table class="posthoc-table"><thead><tr><th>Karşılaştırma</th><th>Ortalama Farkı</th><th>q istatistiği</th><th>p (yaklaşık)</th><th>Karar</th></tr></thead><tbody>`;
+        tukey.forEach(r=>{
+          const cls=r.sig?'posthoc-sig':'posthoc-ns';
+          postHtml+=`<tr class="${cls}"><td>${GRUPLAR[r.i]} vs ${GRUPLAR[r.j]}</td><td>${r.diff}</td><td>${r.q}</td><td>${r.p}</td><td>${r.sig?'✓ Anlamlı':'ns'}</td></tr>`;
+        });
+        postHtml+='</tbody></table>';
+      }
+    }
+  } else {
+    /* KRUSKAL-WALLIS */
+    document.getElementById('mainTestTitle').textContent='📊 Kruskal-Wallis Testi Sonucu';
+    const kw=kruskalWallis(groups);
+    mainHtml=`<span class="test-badge np">Kruskal-Wallis</span>
+    <table class="stat-result-table"><thead><tr><th>Grup</th><th>n</th><th>Medyan</th><th>Ort. Sıra</th></tr></thead><tbody>`;
+    groups.forEach((g,i)=>{
+      const vg=g.filter(x=>x!=null);
+      const sorted=[...vg].sort((a,b)=>a-b);
+      const med=sorted.length?sorted.length%2?sorted[Math.floor(sorted.length/2)]:(sorted[sorted.length/2-1]+sorted[sorted.length/2])/2:null;
+      mainHtml+=`<tr><td><span class="badge ${GRUP_CLS[i]}">${GRUPLAR[i]}</span></td><td>${kw.ns[i]}</td><td>${med!=null?fmt(med):'—'}</td><td>${kw.Ri[i]&&kw.ns[i]?fmt(kw.Ri[i]/kw.ns[i]):'—'}</td></tr>`;
+    });
+    mainHtml+=`</tbody></table>
+    <div style="margin-top:10px;" class="result-row"><span class="result-key">H istatistiği</span><span class="result-val">${kw.H}</span></div>
+    <div class="result-row"><span class="result-key">p değeri</span><span class="result-val ${kw.sig?'sig-yes':'sig-no'}">${kw.p} ${kw.sig?'— anlamlı (p&lt;0.05) ✓':'— anlamsız (p≥0.05)'}</span></div>`;
+    /* DUNN */
+    document.getElementById('postHocTitle').textContent='🔍 Dunn Post-hoc Testi (Bonferroni)';
+    const dunn=dunnTest(groups);
+    if(!dunn.length){postHtml='<span style="color:#9ca3af;">Karşılaştırma yapılamadı.</span>';}
+    else{
+      postHtml=`<span class="test-badge np">Dunn (Bonferroni)</span> &nbsp;<small style="color:#64748b;">Düzeltilmiş α = 0.05/6 = 0.0083</small>`;
+      postHtml+=`<table class="posthoc-table"><thead><tr><th>Karşılaştırma</th><th>z istatistiği</th><th>Ham p</th><th>Düzeltilmiş p</th><th>Karar</th></tr></thead><tbody>`;
+      dunn.forEach(r=>{
+        const cls=r.sig?'posthoc-sig':'posthoc-ns';
+        postHtml+=`<tr class="${cls}"><td>${GRUPLAR[r.a]} vs ${GRUPLAR[r.b]}</td><td>${r.z}</td><td>${r.rawP}</td><td>${r.adjP}</td><td>${r.sig?'✓ Anlamlı':'ns'}</td></tr>`;
+      });
+      postHtml+='</tbody></table>';
+    }
+  }
+  document.getElementById('analizSonuc').innerHTML=mainHtml;
+  document.getElementById('postHocSonuc').innerHTML=postHtml;
+
+  /* İki grup t-testleri (parametrik/non-parametrik) */
+  renderTwoGroupTests(param,isNormal,groups);
+}
+
+function renderTwoGroupTests(param,isNormal,groups){
+  const atG=[...groups[0],...groups[1]].filter(x=>x!=null);
+  const damG=[...groups[2],...groups[3]].filter(x=>x!=null);
+  const uniG=[...groups[0],...groups[2]].filter(x=>x!=null);
+  const biG=[...groups[1],...groups[3]].filter(x=>x!=null);
+
+  function twoGroupResult(gA,gB,labelA,labelB,el){
+    if(gA.length<2||gB.length<2){document.getElementById(el).innerHTML='<span style="color:#9ca3af;">Yeterli veri yok.</span>';return;}
+    const sw1=shapiroWilk(gA),sw2=shapiroWilk(gB);
+    const bothNormal=(sw1.normal!==false)&&(sw2.normal!==false);
+    let html='';
+    if(bothNormal){
+      // Independent t-test (Welch)
+      const m1=mean(gA),m2=mean(gB),s1=std(gA),s2=std(gB),n1=gA.length,n2=gB.length;
+      const se=Math.sqrt(s1*s1/n1+s2*s2/n2);
+      const t=se>0?(m1-m2)/se:0;
+      const df=Math.round((s1*s1/n1+s2*s2/n2)**2/((s1*s1/n1)**2/(n1-1)+(s2*s2/n2)**2/(n2-1)));
+      const p=approxFp(t*t,1,df);
+      const sig=p<0.05;
+      html=`<span class="test-badge">Welch t-testi</span>
+      <div class="result-row"><span class="result-key">${labelA} (n=${n1})</span><span class="result-val">${fmt(m1)} ± ${fmt(s1)}</span></div>
+      <div class="result-row"><span class="result-key">${labelB} (n=${n2})</span><span class="result-val">${fmt(m2)} ± ${fmt(s2)}</span></div>
+      <div class="result-row"><span class="result-key">t (df=${df})</span><span class="result-val">${t.toFixed(3)}</span></div>
+      <div class="result-row"><span class="result-key">p değeri</span><span class="result-val ${sig?'sig-yes':'sig-no'}">${p.toFixed(3)} ${sig?'✓ Anlamlı':'ns'}</span></div>`;
+    } else {
+      // Mann-Whitney U (approx z)
+      const all=[...gA.map(v=>({v,g:0})),...gB.map(v=>({v,g:1}))].sort((a,b)=>a.v-b.v);
+      let i=0;while(i<all.length){let j=i;while(j<all.length&&all[j].v===all[i].v)j++;const avg=(i+j+1)/2;for(let k=i;k<j;k++)all[k].rank=avg;i=j;}
+      const R1=all.filter(d=>d.g===0).reduce((s,d)=>s+d.rank,0);
+      const n1=gA.length,n2=gB.length,N=n1+n2;
+      const U=R1-n1*(n1+1)/2;
+      const muU=n1*n2/2,sigU=Math.sqrt(n1*n2*(N+1)/12);
+      const z=sigU>0?(U-muU)/sigU:0;
+      const p=2*(1-normalCDF(Math.abs(z)));
+      const sig=p<0.05;
+      html=`<span class="test-badge np">Mann-Whitney U</span>
+      <div class="result-row"><span class="result-key">${labelA} (n=${n1}) medyan</span><span class="result-val">${fmt(median(gA))}</span></div>
+      <div class="result-row"><span class="result-key">${labelB} (n=${n2}) medyan</span><span class="result-val">${fmt(median(gB))}</span></div>
+      <div class="result-row"><span class="result-key">U / z istatistiği</span><span class="result-val">${U.toFixed(0)} / ${z.toFixed(3)}</span></div>
+      <div class="result-row"><span class="result-key">p değeri</span><span class="result-val ${sig?'sig-yes':'sig-no'}">${p.toFixed(3)} ${sig?'✓ Anlamlı':'ns'}</span></div>`;
+    }
+    document.getElementById(el).innerHTML=html;
+  }
+  twoGroupResult(atG,damG,'Atomizasyon','Damlatma','tTestSonuc1');
+  twoGroupResult(uniG,biG,'Unilateral','Bilateral','tTestSonuc2');
+}
+
+function median(a){const v=[...a].filter(x=>x!=null).sort((p,q)=>p-q);return v.length?v.length%2?v[Math.floor(v.length/2)]:(v[v.length/2-1]+v[v.length/2])/2:null;}
+
+/* ========================================================
+   TEKRARLI ÖLÇÜMLER ANOVA / FRİEDMAN
+======================================================== */
+let rmChart=null;
+
+function runRM(){
+  const param=document.getElementById('rmParam').value;
+  // Her grup için zaman vektörleri
+  const grupData=GRUPLAR.map(g=>{
+    const gr=hastalar.filter(h=>h.grup===g);
+    return TIMES.map((_,ti)=>gr.map(h=>h.monitorData&&h.monitorData[param]?h.monitorData[param][ti]:null).filter(x=>x!=null));
+  });
+
+  // Varlık kontrolü
+  const hasData=grupData.some(gd=>gd.some(td=>td.length>0));
+  if(!hasData){
+    document.getElementById('rmSonuc').innerHTML=`<div class="alert alert-warn">Monitörizasyon verisi bulunamadı. Lütfen hastalar için T0-T60 değerlerini girin.</div>`;
+    return;
+  }
+
+  // Grup × Zaman tablo
+  let tbl=`<table class="rm-table"><thead><tr><th>Grup</th>`;
+  TIMES.forEach(t=>tbl+=`<th>${t}</th>`);
+  tbl+='</tr></thead><tbody>';
+  grupData.forEach((gd,gi)=>{
+    tbl+=`<tr><td><span class="badge ${GRUP_CLS[gi]}">${GRUPLAR[gi]}</span></td>`;
+    gd.forEach(td=>tbl+=`<td>${td.length?fmt(mean(td))+'<br><small style="color:#9ca3af;">±'+fmt(std(td))+'</small>':'—'}</td>`);
+    tbl+='</tr>';
+  });
+  tbl+='</tbody></table>';
+  document.getElementById('rmTable').innerHTML=tbl;
+
+  // Normallik kontrolü (ilk grubun tüm zamanlarını birleştir)
+  const allVals=grupData.flat(2).filter(x=>x!=null);
+  const sw=shapiroWilk(allVals);
+  let sonucHtml='';
+
+  if(sw.normal!==false&&allVals.length>=4){
+    // Two-way RM ANOVA yaklaşımı
+    sonucHtml+=`<span class="test-badge rep">2-Yönlü Tekrarlı Ölçümler ANOVA</span>
+    <div style="margin-top:10px;">`;
+    // Zaman etkisi
+    const timeMeans=TIMES.map((_,ti)=>{
+      const vals=grupData.flatMap(gd=>gd[ti]);
+      return mean(vals.filter(x=>x!=null));
+    });
+    const timeAll=grupData.flatMap(gd=>gd.flat().filter(x=>x!=null));
+    const grandM=mean(timeAll);
+    const ssTime=timeMeans.filter(x=>x!=null).reduce((s,m)=>s+(m-grandM)**2,0)*Math.max(1,hastalar.length);
+    const ssError=grupData.flatMap((gd,gi)=>gd.flatMap((td,ti)=>td.map(v=>v-mean(gd[ti])**2||0))).reduce((s,x)=>s+x,0)||1;
+    const FTime=ssTime/ssError;
+    const FGroup=grupData.reduce((s,gd)=>{const gm=mean(gd.flat().filter(x=>x!=null));return s+(gm-grandM)**2;},0)*TIMES.length/(ssError||1);
+    const pTime=approxFp(FTime,TIMES.length-1,Math.max(1,allVals.length-TIMES.length));
+    const pGroup=approxFp(FGroup,GRUPLAR.length-1,Math.max(1,allVals.length-GRUPLAR.length));
+    sonucHtml+=`
+    <table class="stat-result-table"><thead><tr><th>Kaynak</th><th>F</th><th>p</th><th>Karar</th></tr></thead><tbody>
+    <tr><td>Zaman Etkisi</td><td>${FTime.toFixed(3)}</td><td>${pTime.toFixed(3)}</td><td class="${pTime<0.05?'sig-yes':'sig-no'}">${pTime<0.05?'✓ Anlamlı':'ns'}</td></tr>
+    <tr><td>Grup Etkisi</td><td>${FGroup.toFixed(3)}</td><td>${pGroup.toFixed(3)}</td><td class="${pGroup<0.05?'sig-yes':'sig-no'}">${pGroup<0.05?'✓ Anlamlı':'ns'}</td></tr>
+    <tr><td>Grup × Zaman Etkileşimi</td><td>—</td><td>—</td><td style="color:#9ca3af;">Tam veri gerektirir</td></tr>
+    </tbody></table></div>`;
+  } else {
+    // Friedman testi
+    sonucHtml+=`<span class="test-badge np">Friedman Testi</span> <small style="color:#64748b;">(Normal dağılım sağlanamadı)</small>`;
+    // Her grup için ayrı Friedman
+    GRUPLAR.forEach((g,gi)=>{
+      const gr=hastalar.filter(h=>h.grup===g&&h.monitorData&&h.monitorData[param]);
+      if(gr.length<2)return;
+      const matrix=gr.map(h=>TIMES.map((_,ti)=>h.monitorData[param][ti]||null).filter(x=>x!=null).length===TIMES.length?TIMES.map((_,ti)=>h.monitorData[param][ti]):null).filter(x=>x);
+      if(matrix.length<2)return;
+      const fr=friedmanTest(matrix);
+      if(!fr)return;
+      sonucHtml+=`<div style="margin-top:8px;"><strong>${g}:</strong> χ² = ${fr.chi}, df = ${fr.df}, p = ${fr.p} <span class="${fr.sig?'sig-yes':'sig-no'}">${fr.sig?'✓ Anlamlı':'ns'}</span></div>`;
+    });
+  }
+  document.getElementById('rmSonuc').innerHTML=sonucHtml;
+
+  // Çizgi grafik
+  const colors=['#378add','#639922','#ba7517','#d4537e'];
+  const datasets=grupData.map((gd,gi)=>({
+    label:GRUPLAR[gi],
+    data:gd.map(td=>td.length?parseFloat(fmt(mean(td))):null),
+    borderColor:colors[gi],backgroundColor:colors[gi]+'33',
+    spanGaps:true,tension:0.3,pointRadius:5
+  }));
+  if(rmChart)rmChart.destroy();
+  const ctx=document.getElementById('rmChart');
+  rmChart=new Chart(ctx,{
+    type:'line',
+    data:{labels:TIMES,datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top'}},
+      scales:{y:{title:{display:true,text:param,font:{size:11}}},x:{title:{display:true,text:'Zaman Noktası'}}}}
+  });
+}
+
+/* ========================================================
+   KATEGORİK ANALİZ
+======================================================== */
+function runKategorik(){
+  const param=document.getElementById('katParam').value;
+  const getKat=(h)=>{
+    if(param==='yanEtki')return h.yanEtki>0?'Var':'Yok';
+    if(param==='damarYolu')return h.damarYolu>0?'Var':'Yok';
+    if(param==='asa')return h.asa;
+    if(param==='cinsiyet')return h.cinsiyet;
+    if(param==='sedDerece'){
+      if(!h.skor)return null;
+      const t15=Object.values(h.skor).reduce((s,arr)=>s+(arr[3]||0),0);
+      if(t15<=3)return'Minimal';else if(t15<=7)return'Hafif';else if(t15<=11)return'Orta';else return'Derin';
+    }
+    return null;
+  };
+  const cats=[...new Set(hastalar.map(getKat).filter(x=>x))].sort();
+  if(!cats.length||hastalar.length<4){
+    document.getElementById('katSonuc').innerHTML='<div class="alert alert-warn">Yeterli veri yok.</div>';
+    return;
+  }
+  // Kontenjans tablosu: satır=grup, sütun=kategori
+  const ct=GRUPLAR.map(g=>cats.map(c=>hastalar.filter(h=>h.grup===g&&getKat(h)===c).length));
+  const res=chiSquare(ct);
+  if(!res){document.getElementById('katSonuc').innerHTML='<div class="alert alert-warn">Hesaplanamadı.</div>';return;}
+  let html=`<span class="test-badge cat">${res.test}</span>`;
+  html+=`<div class="result-row"><span class="result-key">${res.chi2?'χ² istatistiği':'p değeri'}</span><span class="result-val">${res.chi2??res.p}</span></div>`;
+  if(res.df!=null)html+=`<div class="result-row"><span class="result-key">Serbestlik derecesi</span><span class="result-val">${res.df}</span></div>`;
+  html+=`<div class="result-row"><span class="result-key">p değeri</span><span class="result-val ${res.sig?'sig-yes':'sig-no'}">${res.p} ${res.sig?'✓ Anlamlı (p&lt;0.05)':'ns (p≥0.05)'}</span></div>`;
+  if(res.note)html+=`<div style="font-size:11px;color:#64748b;margin-top:4px;">Not: ${res.note} → Fisher Exact uygulandı.</div>`;
+  document.getElementById('katSonuc').innerHTML=html;
+
+  // Frekans tablosu
+  let ftbl=`<table class="stat-result-table"><thead><tr><th>Grup</th>`;
+  cats.forEach(c=>ftbl+=`<th>${c} (n)</th><th>${c} (%)</th>`);
+  ftbl+='<th>Toplam</th></tr></thead><tbody>';
+  ct.forEach((row,gi)=>{
+    const tot=row.reduce((s,x)=>s+x,0);
+    ftbl+=`<tr><td><span class="badge ${GRUP_CLS[gi]}">${GRUPLAR[gi]}</span></td>`;
+    row.forEach(v=>ftbl+=`<td>${v}</td><td>${tot?Math.round(v/tot*100)+'%':'—'}</td>`);
+    ftbl+=`<td>${tot}</td></tr>`;
+  });
+  ftbl+='</tbody></table>';
+  document.getElementById('katFrekans').innerHTML=ftbl;
+}
+
+/* ========================================================
+   UI YARDIMCI FONKSİYONLARI
+======================================================== */
+function buildMonitorTable(){
+  const tb=document.getElementById('monitorTable');tb.innerHTML='';
+  PARAMS.forEach(p=>{
+    const tr=document.createElement('tr');
+    let c=`<td>${p}</td>`;
+    TIMES.forEach((_,ti)=>c+=`<td><input type="number" step="0.1" class="mon-inp" data-p="${p}" data-ti="${ti}" placeholder="—"></td>`);
+    tr.innerHTML=c;tb.appendChild(tr);
+  });
+}
+
+function buildSkorTable(){
+  const tb=document.getElementById('skorTableBody');tb.innerHTML='';
+  KRITERLER.forEach(k=>{
+    const tr=document.createElement('tr');
+    let c=`<td>${k.lbl}</td><td>${k.desc}</td>`;
+    TIMES.forEach((_,ti)=>c+=`<td style="text-align:center;"><select class="skor-sel" data-k="${k.id}" data-ti="${ti}"><option>0</option><option>1</option><option>2</option><option>3</option></select></td>`);
+    tr.innerHTML=c;tb.appendChild(tr);
+  });
+  document.querySelectorAll('.skor-sel').forEach(s=>s.addEventListener('change',updateSkorTotal));
+}
+
+function updateGrupBadge(){
+  const g=document.getElementById('grup').value;
+  const i=GRUPLAR.indexOf(g);
+  document.getElementById('grupBadgeArea').innerHTML=`<span class="badge ${GRUP_CLS[i]}">${g}</span>`;
+}
+
+function calcDoz(){
+  const ag=parseFloat(document.getElementById('agirlik').value);
+  if(!ag||ag<=0){document.getElementById('doz').value='';return;}
+  const doz=ag*0.08;
+  document.getElementById('doz').value=doz.toFixed(3);
+  document.getElementById('dozInfo').textContent=`${ag} kg × 0.08 mg/kg = ${doz.toFixed(3)} mg Medetomidin (Domitor® 1mg/ml → ${doz.toFixed(3)} ml)`;
+}
+
+function getMonitorData(){
+  const d={};
+  document.querySelectorAll('.mon-inp').forEach(inp=>{
+    const p=inp.dataset.p,ti=inp.dataset.ti;
+    if(!d[p])d[p]=Array(7).fill(null);
+    const v=parseFloat(inp.value);
+    d[p][ti]=isNaN(v)?null:v;
+  });
+  return d;
+}
+
+function kaydet(){
+  const kod=document.getElementById('hastaKodu').value.trim();
+  if(!kod){showMsg('kayitMsg','warn','Hasta kodu zorunludur!');return;}
+  if(hastalar.find(h=>h.kod===kod)){showMsg('kayitMsg','warn','Bu kod zaten var.');return;}
+  const ag=parseFloat(document.getElementById('agirlik').value);
+  if(!ag){showMsg('kayitMsg','warn','Ağırlık girilmesi zorunludur!');return;}
+  const hasta={
+    kod,grup:document.getElementById('grup').value,
+    yas:nv('yas'),agirlik:ag,cinsiyet:document.getElementById('cinsiyet').value,
+    asa:document.getElementById('asa').value,doz:nv('doz'),
+    t_klinBasl:nv('t_klinBasl'),t_sternal:nv('t_sternal'),t_uyarilma:nv('t_uyarilma'),
+    t_dogrulma:nv('t_dogrulma'),t_yurume:nv('t_yurume'),t_etkilisedasyon:nv('t_etkilisedasyon'),
+    damarYolu:parseInt(document.getElementById('damarYolu').value),
+    yanEtki:parseInt(document.getElementById('yanEtki').value),
+    monitorData:getMonitorData(),skor:null,kaliSkor:null,
+    kan:{hct:nv('hct'),rbc:nv('rbc'),wbc:nv('wbc'),glukoz:nv('glukoz'),alt:nv('alt'),kreatinin:nv('kreatinin'),ph:nv('ph'),po2:nv('po2'),pco2:nv('pco2')}
+  };
+  hastalar.push(hasta);saveLocal();guncelleUI();temizle();
+  showMsg('kayitMsg','success',`✅ ${kod} başarıyla eklendi.`);
+}
+
+function temizle(){
+  ['hastaKodu','yas','agirlik','doz','t_klinBasl','t_sternal','t_uyarilma','t_dogrulma','t_yurume','t_etkilisedasyon',
+   'hct','rbc','wbc','glukoz','alt','kreatinin','ph','po2','pco2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['grup','cinsiyet','asa','damarYolu','yanEtki'].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
+  document.querySelectorAll('.mon-inp').forEach(i=>i.value='');
+  updateGrupBadge();
+  document.getElementById('dozInfo').textContent='Ağırlık girildiğinde doz otomatik hesaplanır (0.08 mg/kg, Domitor® 1mg/ml).';
+  document.getElementById('kayitMsg').innerHTML='';
+}
+
+function silHasta(i){if(confirm(`"${hastalar[i].kod}" silinsin mi?`)){hastalar.splice(i,1);saveLocal();guncelleUI();}}
+
+function guncelleUI(){
+  document.getElementById('hastaCount').textContent=hastalar.length;
+  const listEl=document.getElementById('hastaList');
+  if(!hastalar.length){listEl.innerHTML='<div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px 0;">Henüz hasta eklenmedi.</div>';return;}
+  listEl.innerHTML=hastalar.map((h,i)=>`
+    <div class="hasta-item">
+      <span style="font-weight:600;font-size:12px;">${h.kod}</span>
+      <span class="badge ${GRUP_CLS[GRUPLAR.indexOf(h.grup)]}" style="font-size:10px;">${h.grup}</span>
+      <span style="font-size:11px;color:#6b7280;">${h.agirlik}kg ${h.skor?'✓':''}</span>
+      <button class="btn btn-danger btn-sm" onclick="silHasta(${i})">Sil</button>
+    </div>`).join('');
+  const sel=document.getElementById('skorHastaSelect');
+  sel.innerHTML='<option value="">— Hasta seçin —</option>'+hastalar.map((h,i)=>`<option value="${i}">${h.kod} (${h.grup})</option>`).join('');
+  updateAnalizCounts();updateOzetPage();
+}
+
+function loadSkorHasta(){
+  const idx=document.getElementById('skorHastaSelect').value;
+  if(idx===''){document.getElementById('skorGrupDisplay').value='';return;}
+  const h=hastalar[idx];
+  document.getElementById('skorGrupDisplay').value=h.grup;
+  if(h.skor){KRITERLER.forEach(k=>{document.querySelectorAll(`.skor-sel[data-k="${k.id}"]`).forEach((s,ti)=>{s.value=h.skor[k.id][ti]||0;});});}
+  else{document.querySelectorAll('.skor-sel').forEach(s=>s.value=0);}
+  if(h.kaliSkor!=null){document.getElementById('kaliSkor').value=h.kaliSkor;document.getElementById('kaliSkorVal').textContent=h.kaliSkor;}
+  updateSkorTotal();
+}
+
+function updateSkorTotal(){
+  const d={};
+  KRITERLER.forEach(k=>{d[k.id]=[];});
+  document.querySelectorAll('.skor-sel').forEach(s=>d[s.dataset.k].push(parseInt(s.value)));
+  let t15=0;
+  KRITERLER.forEach(k=>t15+=d[k.id][3]||0);
+  document.getElementById('totalSkorDisplay').textContent=t15;
+  const bar=document.getElementById('sedasyonBar');bar.innerHTML='';
+  for(let i=0;i<15;i++){
+    const seg=document.createElement('div');seg.className='sed-seg';
+    if(i<t15){if(t15<=3)seg.classList.add('sed-filled-1');else if(t15<=7)seg.classList.add('sed-filled-2');else if(t15<=11)seg.classList.add('sed-filled-3');else seg.classList.add('sed-filled-4');}
+    bar.appendChild(seg);
+  }
+  let txt='',cls='alert-info';
+  if(t15<=3){txt=`Skor: ${t15}/15 → Minimal / Yetersiz Sedasyon`;cls='alert-warn';}
+  else if(t15<=7){txt=`Skor: ${t15}/15 → Hafif Sedasyon`;cls='alert-info';}
+  else if(t15<=11){txt=`Skor: ${t15}/15 → Orta Sedasyon`;cls='alert-success';}
+  else{txt=`Skor: ${t15}/15 → Derin Sedasyon`;cls='alert-danger';}
+  const el=document.getElementById('skorYorum');el.className=`alert ${cls}`;el.textContent=txt;
+}
+
+function kaydetSkor(){
+  const idx=document.getElementById('skorHastaSelect').value;
+  if(idx===''){showMsg('skorSaveMsg','warn','Lütfen hasta seçin.');return;}
+  const d={};
+  KRITERLER.forEach(k=>{d[k.id]=[];document.querySelectorAll(`.skor-sel[data-k="${k.id}"]`).forEach(s=>d[k.id].push(parseInt(s.value)));});
+  hastalar[idx].skor=d;
+  hastalar[idx].kaliSkor=parseInt(document.getElementById('kaliSkor').value);
+  saveLocal();guncelleUI();showMsg('skorSaveMsg','success','✅ Sedasyon skoru kaydedildi.');
+}
+
+function updateAnalizCounts(){
+  GRUPLAR.forEach((g,i)=>{
+    const n=hastalar.filter(h=>h.grup===g).length;
+    document.getElementById(`an_g${i+1}`).textContent=n;
+    document.getElementById(`pb${i+1}`).style.width=(n*10)+'%';
+  });
+}
+
+function updateOzetPage(){
+  document.getElementById('ozetCards').innerHTML=GRUPLAR.map((g,i)=>{
+    const n=hastalar.filter(h=>h.grup===g).length;
+    return`<div class="stat-card"><div class="val" style="color:${['#0c447c','#27500a','#633806','#72243e'][i]};">${n}/10</div><div class="lbl">${g}</div><div class="progress-wrap"><div class="progress-bar" style="background:${['#378add','#639922','#ba7517','#d4537e'][i]};width:${n*10}%"></div></div></div>`;
+  }).join('');
+
+  const tbody=document.getElementById('ozetTableBody');
+  const rows=GRUPLAR.map((g,gi)=>{
+    const gr=hastalar.filter(h=>h.grup===g);
+    if(!gr.length)return`<tr><td><span class="badge ${GRUP_CLS[gi]}">${g}</span></td><td>0</td><td colspan="8" style="color:#9ca3af;">Veri yok</td></tr>`;
+    const ms=p=>{const vals=gr.map(h=>h[p]).filter(x=>x!=null);const m=mean(vals),s=std(vals);return m!=null?`${fmt(m)} ± ${fmt(s)}`:'—';};
+    const yanPct=Math.round(gr.filter(h=>h.yanEtki>0).length/gr.length*100);
+    const damPct=Math.round(gr.filter(h=>h.damarYolu>0).length/gr.length*100);
+    return`<tr><td><span class="badge ${GRUP_CLS[gi]}">${g}</span></td><td>${gr.length}</td><td>${ms('t_klinBasl')}</td><td>${ms('t_sternal')}</td><td>${ms('t_etkilisedasyon')}</td><td>${ms('t_uyarilma')}</td><td>${ms('t_dogrulma')}</td><td>${ms('t_yurume')}</td><td>${yanPct}%</td><td>${damPct}%</td></tr>`;
+  });
+  tbody.innerHTML=rows.join('');
+  updateBarCharts();
+}
+
+function updateBarCharts(){
+  const colors=['#b5d4f4','#c0dd97','#fac775','#f4c0d1'];
+  const borders=['#378add','#639922','#ba7517','#d4537e'];
+  buildBar('barChart1',GRUPLAR,GRUPLAR.map(g=>{const v=hastalar.filter(h=>h.grup===g).map(h=>h.t_klinBasl).filter(x=>x!=null);return v.length?parseFloat(fmt(mean(v))):0;}),'Ort. Sedasyon Başlangıcı (dk)',colors,borders);
+  buildBar('barChart2',GRUPLAR,GRUPLAR.map(g=>{const v=hastalar.filter(h=>h.grup===g).map(h=>h.t_etkilisedasyon).filter(x=>x!=null);return v.length?parseFloat(fmt(mean(v))):0;}),'Ort. Etkili Sedasyon Süresi (dk)',colors,borders);
+}
+
+function buildBar(id,lbls,data,label,bgC,brC){
+  if(charts[id])charts[id].destroy();
+  const ctx=document.getElementById(id);if(!ctx)return;
+  charts[id]=new Chart(ctx,{type:'bar',data:{labels:lbls,datasets:[{label,data,backgroundColor:bgC,borderColor:brC,borderWidth:1.5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{beginAtZero:true,title:{display:true,text:'Dakika',font:{size:11}}},x:{ticks:{autoSkip:false,font:{size:11}}}}}});
+}
+
+/* ========================================================
+   KAYDET / YÜKLE / EXPORT
+======================================================== */
+function saveLocal(){try{localStorage.setItem('medetomidinV2',JSON.stringify(hastalar));}catch(e){}}
+function loadLocal(){try{const d=localStorage.getItem('medetomidinV2');if(d)hastalar=JSON.parse(d);}catch(e){}}
+function exportJSON(){
+  const b=new Blob([JSON.stringify({hastalar,exportDate:new Date().toISOString()},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='medetomidin_veri.json';a.click();
+}
+function importJSON(){document.getElementById('importFile').click();}
+function doImport(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{try{const d=JSON.parse(ev.target.result);hastalar=d.hastalar||d;saveLocal();guncelleUI();alert('Veri başarıyla yüklendi!');}catch{alert('Geçersiz dosya.');}};
+  r.readAsText(f);e.target.value='';
+}
+function exportCSV(){
+  const hdr=['Kod','Grup','Yaş','Ağırlık','Cinsiyet','ASA','Doz(mg)','Sed.Baş','Sternal','EtkiliSed','Uyarılma','Doğrulma','Yürüme','YanEtki','DamarYolu'];
+  const rows=hastalar.map(h=>[h.kod,h.grup,h.yas,h.agirlik,h.cinsiyet,h.asa,h.doz,h.t_klinBasl,h.t_sternal,h.t_etkilisedasyon,h.t_uyarilma,h.t_dogrulma,h.t_yurume,h.yanEtki,h.damarYolu]);
+  const csv=[hdr,...rows].map(r=>r.join(',')).join('\n');
+  const b=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='medetomidin_data.csv';a.click();
+}
+function tumVeriyiSil(){if(confirm('Tüm veriler silinecek. Emin misiniz?')){hastalar=[];saveLocal();guncelleUI();}}
+function showMsg(id,type,msg){
+  const el=document.getElementById(id);if(!el)return;
+  el.innerHTML=`<div class="alert ${{success:'alert-success',warn:'alert-warn',danger:'alert-danger',info:'alert-info'}[type]}">${msg}</div>`;
+  setTimeout(()=>el.innerHTML='',4000);
+}
+
+function demoVeri(){
+  const d=[
+    {kod:'D-001',grup:'MED-AT-U',yas:2,agirlik:3.8,cinsiyet:'Erkek',asa:'ASA I',doz:0.304,t_klinBasl:4.5,t_sternal:6.2,t_uyarilma:38,t_dogrulma:42,t_yurume:46,t_etkilisedasyon:35,damarYolu:0,yanEtki:0,monitorData:{'HR (atım/dk)':[120,105,98,95,100,108,115],'SpO₂ (%)':[99,98,97,97,98,98,99],'RT (°C)':[38.5,38.4,38.3,38.2,38.3,38.4,38.5],'fR (solunum/dk)':[28,24,22,20,22,24,26],'MAP (mmHg)':[95,88,82,80,83,87,92],'SAP (mmHg)':[120,112,105,102,105,110,116],'DAP (mmHg)':[78,72,68,66,68,71,76],'Termal Kamera (°C)':[37.8,37.6,37.5,37.4,37.5,37.6,37.8],'Özafagal Sıcaklık (°C)':[38.4,38.3,38.2,38.1,38.2,38.3,38.4]},skor:null,kaliSkor:null,kan:{hct:38,rbc:7.2,wbc:8.5,glukoz:95,alt:35,kreatinin:1.1,ph:7.38,po2:98,pco2:38}},
+    {kod:'D-002',grup:'MED-AT-U',yas:1.5,agirlik:3.2,cinsiyet:'Erkek',asa:'ASA I',doz:0.256,t_klinBasl:5.0,t_sternal:7.0,t_uyarilma:35,t_dogrulma:39,t_yurume:44,t_etkilisedasyon:30,damarYolu:0,yanEtki:0,monitorData:{'HR (atım/dk)':[118,102,95,92,96,104,112],'SpO₂ (%)':[98,97,97,96,97,98,98],'RT (°C)':[38.3,38.2,38.1,38.0,38.1,38.2,38.3],'fR (solunum/dk)':[26,22,20,18,20,22,24],'MAP (mmHg)':[92,85,80,78,80,84,89],'SAP (mmHg)':[116,108,102,100,102,107,113],'DAP (mmHg)':[76,70,66,64,66,69,74],'Termal Kamera (°C)':[37.6,37.4,37.3,37.2,37.3,37.4,37.6],'Özafagal Sıcaklık (°C)':[38.2,38.1,38.0,37.9,38.0,38.1,38.2]},skor:null,kaliSkor:null,kan:{hct:36,rbc:7.0,wbc:9.0,glukoz:92,alt:38,kreatinin:1.0,ph:7.40,po2:97,pco2:39}},
+    {kod:'D-003',grup:'MED-AT-U',yas:2.5,agirlik:4.0,cinsiyet:'Erkek',asa:'ASA I',doz:0.320,t_klinBasl:4.8,t_sternal:6.5,t_uyarilma:40,t_dogrulma:44,t_yurume:48,t_etkilisedasyon:33,damarYolu:0,yanEtki:0,monitorData:{'HR (atım/dk)':[122,107,100,97,102,110,118],'SpO₂ (%)':[99,98,98,97,98,99,99],'RT (°C)':[38.6,38.5,38.4,38.3,38.4,38.5,38.6],'fR (solunum/dk)':[30,25,23,21,23,25,28],'MAP (mmHg)':[96,89,83,81,84,88,93],'SAP (mmHg)':[122,114,107,104,107,112,118],'DAP (mmHg)':[79,73,69,67,69,72,77],'Termal Kamera (°C)':[37.9,37.7,37.6,37.5,37.6,37.7,37.9],'Özafagal Sıcaklık (°C)':[38.5,38.4,38.3,38.2,38.3,38.4,38.5]},skor:null,kaliSkor:null,kan:{hct:40,rbc:7.4,wbc:8.2,glukoz:98,alt:32,kreatinin:1.2,ph:7.37,po2:99,pco2:37}},
+    {kod:'D-004',grup:'MED-AT-B',yas:2.5,agirlik:4.1,cinsiyet:'Erkek',asa:'ASA I',doz:0.328,t_klinBasl:3.8,t_sternal:5.5,t_uyarilma:42,t_dogrulma:46,t_yurume:50,t_etkilisedasyon:40,damarYolu:0,yanEtki:0,monitorData:{'HR (atım/dk)':[115,98,90,86,90,98,108],'SpO₂ (%)':[99,98,97,96,97,98,99],'RT (°C)':[38.4,38.3,38.1,38.0,38.1,38.3,38.4],'fR (solunum/dk)':[26,21,19,17,19,21,24],'MAP (mmHg)':[93,86,79,76,79,84,90],'SAP (mmHg)':[118,110,103,100,103,108,114],'DAP (mmHg)':[77,71,66,63,66,70,75],'Termal Kamera (°C)':[37.7,37.5,37.4,37.2,37.3,37.5,37.7],'Özafagal Sıcaklık (°C)':[38.3,38.2,38.0,37.9,38.0,38.2,38.3]},skor:null,kaliSkor:null,kan:{hct:39,rbc:7.3,wbc:8.8,glukoz:94,alt:36,kreatinin:1.1,ph:7.39,po2:98,pco2:38}},
+    {kod:'D-005',grup:'MED-AT-B',yas:3,agirlik:4.5,cinsiyet:'Erkek',asa:'ASA II',doz:0.360,t_klinBasl:3.5,t_sternal:5.0,t_uyarilma:44,t_dogrulma:48,t_yurume:52,t_etkilisedasyon:42,damarYolu:1,yanEtki:0,monitorData:{'HR (atım/dk)':[112,95,88,84,88,95,105],'SpO₂ (%)':[98,97,96,95,96,97,98],'RT (°C)':[38.2,38.1,38.0,37.9,38.0,38.1,38.2],'fR (solunum/dk)':[24,20,18,16,18,20,22],'MAP (mmHg)':[91,84,77,74,77,82,88],'SAP (mmHg)':[115,107,100,97,100,105,112],'DAP (mmHg)':[75,69,63,61,63,68,73],'Termal Kamera (°C)':[37.5,37.3,37.2,37.0,37.1,37.3,37.5],'Özafagal Sıcaklık (°C)':[38.1,38.0,37.9,37.8,37.9,38.0,38.1]},skor:null,kaliSkor:null,kan:{hct:41,rbc:7.5,wbc:8.0,glukoz:100,alt:33,kreatinin:1.3,ph:7.36,po2:97,pco2:40}},
+    {kod:'D-006',grup:'MED-AT-B',yas:2,agirlik:3.9,cinsiyet:'Erkek',asa:'ASA I',doz:0.312,t_klinBasl:3.9,t_sternal:5.6,t_uyarilma:43,t_dogrulma:47,t_yurume:51,t_etkilisedasyon:41,damarYolu:0,yanEtki:0,monitorData:{'HR (atım/dk)':[116,99,91,87,91,99,109],'SpO₂ (%)':[99,98,97,96,97,98,99],'RT (°C)':[38.3,38.2,38.0,37.9,38.0,38.2,38.3],'fR (solunum/dk)':[25,20,18,16,18,20,23],'MAP (mmHg)':[92,85,78,75,78,83,89],'SAP (mmHg)':[116,108,101,98,101,106,113],'DAP (mmHg)':[76,70,64,62,64,69,74],'Termal Kamera (°C)':[37.6,37.4,37.3,37.1,37.2,37.4,37.6],'Özafagal Sıcaklık (°C)':[38.2,38.1,37.9,37.8,37.9,38.1,38.2]},skor:null,kaliSkor:null,kan:{hct:38,rbc:7.1,wbc:8.6,glukoz:93,alt:37,kreatinin:1.0,ph:7.40,po2:98,pco2:38}},
+    {kod:'D-007',grup:'MED-DAM-U',yas:2,agirlik:3.5,cinsiyet:'Erkek',asa:'ASA I',doz:0.280,t_klinBasl:6.8,t_sternal:9.0,t_uyarilma:28,t_dogrulma:33,t_yurume:38,t_etkilisedasyon:22,damarYolu:0,yanEtki:0,monitorData:{'HR (atım/dk)':[124,114,108,105,108,114,120],'SpO₂ (%)':[98,97,96,96,97,97,98],'RT (°C)':[38.6,38.5,38.4,38.3,38.4,38.5,38.6],'fR (solunum/dk)':[30,26,24,22,24,26,28],'MAP (mmHg)':[97,91,86,84,86,90,94],'SAP (mmHg)':[123,116,110,107,110,115,120],'DAP (mmHg)':[80,74,71,69,71,74,78],'Termal Kamera (°C)':[38.0,37.8,37.7,37.6,37.7,37.8,38.0],'Özafagal Sıcaklık (°C)':[38.5,38.4,38.3,38.2,38.3,38.4,38.5]},skor:null,kaliSkor:null,kan:{hct:37,rbc:7.0,wbc:9.2,glukoz:96,alt:39,kreatinin:1.1,ph:7.38,po2:96,pco2:39}},
+    {kod:'D-008',grup:'MED-DAM-U',yas:1.5,agirlik:3.0,cinsiyet:'Erkek',asa:'ASA I',doz:0.240,t_klinBasl:7.5,t_sternal:10.0,t_uyarilma:25,t_dogrulma:30,t_yurume:35,t_etkilisedasyon:18,damarYolu:0,yanEtki:1,monitorData:{'HR (atım/dk)':[126,116,110,107,110,116,122],'SpO₂ (%)':[97,96,95,95,96,96,97],'RT (°C)':[38.8,38.7,38.6,38.5,38.6,38.7,38.8],'fR (solunum/dk)':[32,28,26,24,26,28,30],'MAP (mmHg)':[99,93,88,86,88,92,96],'SAP (mmHg)':[125,118,112,109,112,117,122],'DAP (mmHg)':[82,76,73,71,73,76,80],'Termal Kamera (°C)':[38.2,38.0,37.9,37.8,37.9,38.0,38.2],'Özafagal Sıcaklık (°C)':[38.7,38.6,38.5,38.4,38.5,38.6,38.7]},skor:null,kaliSkor:null,kan:{hct:35,rbc:6.8,wbc:9.5,glukoz:90,alt:42,kreatinin:0.9,ph:7.41,po2:95,pco2:40}},
+    {kod:'D-009',grup:'MED-DAM-U',yas:2.5,agirlik:3.7,cinsiyet:'Erkek',asa:'ASA I',doz:0.296,t_klinBasl:7.0,t_sternal:9.5,t_uyarilma:27,t_dogrulma:32,t_yurume:37,t_etkilisedasyon:20,damarYolu:0,yanEtki:0,monitorData:{'HR (atım/dk)':[122,112,106,103,106,112,118],'SpO₂ (%)':[98,97,96,96,97,97,98],'RT (°C)':[38.5,38.4,38.3,38.2,38.3,38.4,38.5],'fR (solunum/dk)':[28,24,22,20,22,24,26],'MAP (mmHg)':[96,90,85,83,85,89,93],'SAP (mmHg)':[121,114,108,105,108,113,119],'DAP (mmHg)':[79,73,70,68,70,73,77],'Termal Kamera (°C)':[37.9,37.7,37.6,37.5,37.6,37.7,37.9],'Özafagal Sıcaklık (°C)':[38.4,38.3,38.2,38.1,38.2,38.3,38.4]},skor:null,kaliSkor:null,kan:{hct:37,rbc:7.1,wbc:8.8,glukoz:94,alt:36,kreatinin:1.0,ph:7.39,po2:97,pco2:38}},
+    {kod:'D-010',grup:'MED-DAM-B',yas:2.5,agirlik:4.0,cinsiyet:'Erkek',asa:'ASA I',doz:0.320,t_klinBasl:5.5,t_sternal:7.5,t_uyarilma:32,t_dogrulma:37,t_yurume:42,t_etkilisedasyon:28,damarYolu:0,yanEtki:0,monitorData:{'HR (atım/dk)':[118,106,99,96,99,106,114],'SpO₂ (%)':[99,98,97,97,97,98,99],'RT (°C)':[38.4,38.3,38.2,38.1,38.2,38.3,38.4],'fR (solunum/dk)':[27,23,21,19,21,23,25],'MAP (mmHg)':[94,87,82,79,82,86,91],'SAP (mmHg)':[119,111,105,102,105,110,116],'DAP (mmHg)':[77,71,67,65,67,71,75],'Termal Kamera (°C)':[37.8,37.6,37.5,37.4,37.5,37.6,37.8],'Özafagal Sıcaklık (°C)':[38.3,38.2,38.1,38.0,38.1,38.2,38.3]},skor:null,kaliSkor:null,kan:{hct:39,rbc:7.3,wbc:8.4,glukoz:96,alt:34,kreatinin:1.1,ph:7.38,po2:98,pco2:38}},
+    {kod:'D-011',grup:'MED-DAM-B',yas:3,agirlik:4.3,cinsiyet:'Erkek',asa:'ASA I',doz:0.344,t_klinBasl:5.8,t_sternal:8.0,t_uyarilma:30,t_dogrulma:35,t_yurume:40,t_etkilisedasyon:25,damarYolu:0,yanEtki:0,monitorData:{'HR (atım/dk)':[119,108,101,98,101,108,116],'SpO₂ (%)':[98,97,96,96,97,97,98],'RT (°C)':[38.5,38.4,38.3,38.2,38.3,38.4,38.5],'fR (solunum/dk)':[28,24,22,20,22,24,26],'MAP (mmHg)':[95,88,83,81,83,87,92],'SAP (mmHg)':[120,112,106,103,106,111,117],'DAP (mmHg)':[78,72,68,66,68,72,76],'Termal Kamera (°C)':[37.9,37.7,37.6,37.5,37.6,37.7,37.9],'Özafagal Sıcaklık (°C)':[38.4,38.3,38.2,38.1,38.2,38.3,38.4]},skor:null,kaliSkor:null,kan:{hct:40,rbc:7.4,wbc:8.3,glukoz:97,alt:35,kreatinin:1.2,ph:7.37,po2:97,pco2:39}},
+    {kod:'D-012',grup:'MED-DAM-B',yas:2,agirlik:3.8,cinsiyet:'Erkek',asa:'ASA I',doz:0.304,t_klinBasl:5.6,t_sternal:7.7,t_uyarilma:31,t_dogrulma:36,t_yurume:41,t_etkilisedasyon:26,damarYolu:0,yanEtki:0,monitorData:{'HR (atım/dk)':[117,105,98,95,98,105,113],'SpO₂ (%)':[99,98,97,97,97,98,99],'RT (°C)':[38.3,38.2,38.1,38.0,38.1,38.2,38.3],'fR (solunum/dk)':[26,22,20,18,20,22,24],'MAP (mmHg)':[93,86,81,78,81,85,90],'SAP (mmHg)':[117,109,103,100,103,108,114],'DAP (mmHg)':[76,70,66,64,66,70,74],'Termal Kamera (°C)':[37.7,37.5,37.4,37.3,37.4,37.5,37.7],'Özafagal Sıcaklık (°C)':[38.2,38.1,38.0,37.9,38.0,38.1,38.2]},skor:null,kaliSkor:null,kan:{hct:38,rbc:7.2,wbc:8.6,glukoz:95,alt:36,kreatinin:1.0,ph:7.39,po2:98,pco2:38}}
+  ];
+  d.forEach(h=>{if(!hastalar.find(x=>x.kod===h.kod))hastalar.push(h);});
+  saveLocal();guncelleUI();showPage('ozet');
+}
+
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const names=['veri','sedasyon','analiz','rm','kategorik','ozet'];
+  document.querySelectorAll('.tab')[names.indexOf(name)].classList.add('active');
+  if(name==='ozet')updateOzetPage();
+  if(name==='analiz')updateAnalizCounts();
+  if(name==='kategorik'){}
+}
+
+// INIT
+buildMonitorTable();
+buildSkorTable();
+updateGrupBadge();
+loadLocal();
+guncelleUI();
+</script>
+</body>
+</html>
